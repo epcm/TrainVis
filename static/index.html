@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>People on Subway</title>
+    <script src="./static/jquery-3.6.0.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl@2/dist/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat@latest/dist/ecStat.min.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
+    <script type="text/javascript" src="./static/bmap.js"></script>
+</head>
+
+
+<body style="height: 100%; margin: 0">
+
+    <div id="main" style="height: 100%"></div>
+    <!--统计图显示于此-->
+    <script type="text/javascript">
+
+        //var echarts = require('echarts');
+        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+        var app = {};
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom, 'dark');
+        var option;
+
+        $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
+
+            var points = [].concat.apply([], data.map(function (track) {
+                return track.map(function (seg) {
+                    return seg.coord.concat([1]);
+                });
+            }));
+            //alert(points);
+            myChart.setOption(option = {
+                animation: false,
+                bmap: {
+                    center: [120.13066322374, 30.240018034923],
+                    zoom: 14,
+                    roam: true
+                },
+                visualMap: {
+                    show: false,
+                    top: 'top',
+                    min: 0,
+                    max: 5,
+                    seriesIndex: 0,
+                    calculable: true,
+                    inRange: {
+                        color: ['blue', 'blue', 'green', 'yellow', 'red']
+                    }
+                },
+                series: [{
+                    type: 'heatmap',
+                    coordinateSystem: 'bmap',
+                    data: points,
+                    pointSize: 5,
+                    blurSize: 6
+                }]
+            });
+            // 添加百度地图插件
+            var bmap = myChart.getModel().getComponent('bmap').getBMap();
+            bmap.addControl(new BMap.MapTypeControl());
+        });
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+    </script>
+</body>
+
+</html>
