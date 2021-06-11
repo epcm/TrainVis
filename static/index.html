@@ -5,73 +5,112 @@
     <meta charset="UTF-8" />
     <title>People on Subway</title>
     <script src="./static/jquery-3.6.0.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/extension/dataTool.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/extension/dataTool.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl@2/dist/echarts-gl.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat@latest/dist/ecStat.min.js"></script>
-    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
     <script type="text/javascript" src="./static/bmap.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 
-<body style="height: 100%; margin: 0">
+<!-- <nav class="navbar navbar-default bg-dark navbar-dark" style="height: 8%">
+    <a class="navbar-brand" href="#">TrainVis</a>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link 1</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link 2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link 3</a>
+            </li>
+        </ul>
+    </nav>
+    </ul>
+</nav> -->
 
-    <div id="main" style="height: 100%"></div>
-    <!--统计图显示于此-->
-    <script type="text/javascript">
+<body style="height: 100%; margin:0 0 0 0"></body>
 
-        //var echarts = require('echarts');
-        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
-        var app = {};
+<div id="main" style="height: 100%"></div>
+<!--统计图显示于此-->
+<script type="text/javascript">
 
-        var chartDom = document.getElementById('main');
-        var myChart = echarts.init(chartDom, 'dark');
-        var option;
+    //var echarts = require('echarts');
+    var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+    var app = {};
 
-        $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom);
+    var option;
 
-            var points = [].concat.apply([], data.map(function (track) {
-                return track.map(function (seg) {
-                    return seg.coord.concat([1]);
-                });
-            }));
-            //alert(points);
-            myChart.setOption(option = {
-                animation: false,
-                bmap: {
-                    center: [120.13066322374, 30.240018034923],
-                    zoom: 14,
-                    roam: true
-                },
-                visualMap: {
-                    show: false,
-                    top: 'top',
-                    min: 0,
-                    max: 5,
-                    seriesIndex: 0,
-                    calculable: true,
-                    inRange: {
-                        color: ['blue', 'blue', 'green', 'yellow', 'red']
-                    }
-                },
-                series: [{
-                    type: 'heatmap',
-                    coordinateSystem: 'bmap',
-                    data: points,
-                    pointSize: 5,
-                    blurSize: 6
-                }]
+    $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
+
+        var points = [].concat.apply([], data.map(function (track) {
+            return track.map(function (seg) {
+                return seg.coord.concat([seg.elevation]);
             });
-            // 添加百度地图插件
-            var bmap = myChart.getModel().getComponent('bmap').getBMap();
-            bmap.addControl(new BMap.MapTypeControl());
+        }));
+        //alert(points);
+        myChart.setOption(option = {
+            animation: true,
+            // geo: {
+            //     center: [120.13066322374, 30.240018034923],
+            //     zoom: 360,
+            //     map: 'china',
+            //     roam: true,
+            //     silent: true,
+            //     itemStyle: {
+            //         color: 'transparent',
+            //         borderColor: 'rgba(255,255,255,0.1)',
+            //         borderWidth: 1
+            //     }
+            // },
+            bmap: {
+                center: [120.13066322374, 30.240018034923],
+                zoom: 14,
+                roam: true
+            },
+            visualMap: {
+                show: true,
+                top: 'top',
+                min: 0,
+                max: 5,
+                seriesIndex: 0,
+                calculable: true,
+                inRange: {
+                    color: ['blue', 'green', 'yellow', 'red']
+                }
+            },
+            series: [{
+                type: 'heatmap',
+                coordinateSystem: 'bmap',
+                data: points,
+                pointSize: 2,
+                blurSize: 3
+            }]
         });
+        //  添加百度地图插件
+        var bmap = myChart.getModel().getComponent('bmap').getBMap();
+        //bmap.addControl(new BMap.MapTypeControl());
+        bmap.setMapStyleV2({
+            styleId: 'b0a8cb25619b8aec496dfadbcfb706c6'
+        });
+    });
 
-        if (option && typeof option === 'object') {
-            myChart.setOption(option);
-        }
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
+    }
 
-    </script>
+</script>
 </body>
 
 </html>
