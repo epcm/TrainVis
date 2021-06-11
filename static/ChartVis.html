@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>People on Subway</title>
+    <script src="./static/jquery-3.6.0.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
+
+    <!-- <script
+        src="https://webapi.amap.com/maps?v=1.4.15&key=a965d6338787750450f3bb358c3f5574&plugin=AMap.Scale,AMap.ToolBar"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script> -->
+
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
+    <script type="text/javascript" src="./static/bmap.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark" style="height: 8%; font-size: 20px; text-align:center">
+    <a class="navbar-brand" href="#" style="font-size: 25px">TrainVis</a>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Link 1</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link 2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link 3</a>
+            </li>
+        </ul>
+    
+    </ul>
+</nav>
+
+<body style="height: 92%; margin: 0">
+
+    <div id="main" style="height: 100%; margin: 0"></div>
+    <!--统计图显示于此-->
+    <script type="text/javascript">
+
+        //var echarts = require('echarts');
+        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+        var app = {};
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        $.get(ROOT_PATH + '/data/asset/data/hangzhou-tracks.json', function (data) {
+
+            var points = [].concat.apply([], data.map(function (track) {
+                return track.map(function (seg) {
+                    return seg.coord.concat([seg.elevation]);
+                });
+            }));
+            //alert(points);
+            myChart.setOption(option = {
+                animation: true,
+                bmap: {
+                    center: [120.13066322374, 30.230018034821],
+                    zoom: 14,
+                    roam: true
+                },
+                visualMap: {
+                    show: true,
+                    top: 'top',
+                    min: 0,
+                    max: 5,
+                    seriesIndex: 0,
+                    calculable: true,
+                    inRange: {
+                        color: ['blue', 'green', 'yellow', 'red']
+                    }
+                },
+                series: [{
+                    type: 'heatmap',
+                    coordinateSystem: 'bmap',
+                    data: points,
+                    pointSize: 2,
+                    blurSize: 3
+                }]
+            });
+            //  添加百度地图插件
+            var bmap = myChart.getModel().getComponent('bmap').getBMap();
+            bmap.setMapStyleV2({
+                styleId: 'b0a8cb25619b8aec496dfadbcfb706c6'
+            });
+        });
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+    </script>
+</body>
+
+</html>
