@@ -7,7 +7,6 @@
     <script src="./static/jquery-3.6.0.js"></script>
     <script type="text/javascript"
         src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
-
     <!-- <script
         src="https://webapi.amap.com/maps?v=1.4.15&key=a965d6338787750450f3bb358c3f5574&plugin=AMap.Scale,AMap.ToolBar"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script> -->
@@ -24,13 +23,13 @@
     <a class="navbar-brand mr-auto" href="/" style="font-size: 25px">TrainVis</a>
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-            <a class="nav-link active" href="/StationVis">StationVis</a>
+            <a class="nav-link" href="/StationVis">StationVis</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/TrainVis">TrainVis</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/AccessVis">AccessVis</a>
+            <a class="nav-link active" href="/AccessVis">AccessVis</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/ChartVis">ChartVis</a>
@@ -48,8 +47,6 @@
     <script type="text/javascript">
 
         //var echarts = require('echarts');
-        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
-        var app = {};
 
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom);
@@ -58,19 +55,25 @@
         $.get('static/StationInfo.json', function (data) {
 
             var points = [].concat(data.map(function (track) {
-                var ls = [];
-                ls.push(track.lon);
-                ls.push(track.lat);
+                var ls = [track.lon, track.lat];
                 if (track.trains == undefined)
                     ls.push([]);
                 else
-                    ls.push(Object.values(track.trains));
+                    ls.push(Object.values(track.trains).length);
                 //alert(track.trains);
-                return ls;
+                var dic = { name: track.name, value: ls };
+                return dic;
             }));
-            //alert(points[1]);
+            //alert(points[1].value);
+            // 筛选
+            points = points.sort(function (a, b) {
+                return b.value[2] - a.value[2];
+            }).slice(0, 501);
+
             myChart.setOption(option = {
-                animation: true,
+                tooltip: {
+                    trigger: 'item'
+                },
                 bmap: {
                     center: [104.114129, 37.550339],
                     zoom: 5,
@@ -78,28 +81,48 @@
                 },
                 visualMap: {
                     show: true,
-                    top: 'top',
-                    min: 0,
-                    max: 5,
+                    top: 'bottom',
+                    left: 'right',
+                    min: 50,
+                    max: 700,
                     seriesIndex: 0,
                     calculable: true,
                     inRange: {
                         color: ['blue', 'green', 'yellow', 'red']
                     }
                 },
-                series: [{
-                    type: 'heatmap',
-                    coordinateSystem: 'bmap',
-                    data: points,
-                    pointSize: 3,
-                    blurSize: 4
-                }]
+                series: [
+                    {
+                        type: 'scatter',
+                        coordinateSystem: 'bmap',
+                        data: points,
+                        symbolSize: function (val) {
+                            return val[2] / 12;
+                        },
+                        encode: {
+                            value: 2
+                        },
+                        label: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        // emphasis: {
+                        //     label: {
+                        //         show: true
+                        //     }
+                        // }
+                    },
+                ]
             });
             //  添加百度地图插件
             var bmap = myChart.getModel().getComponent('bmap').getBMap();
             bmap.setMapStyleV2({
                 styleId: 'b0a8cb25619b8aec496dfadbcfb706c6'
             });
+            bmap.enableScrollWheelZoom(true)
+            var scaleCtrl = new BMap.ScaleControl();  // 添加比例尺控件
+            bmap.addControl(scaleCtrl);
         });
 
         if (option && typeof option === 'object') {

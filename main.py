@@ -15,6 +15,10 @@ def TrainVis():
 def AccessVis():
     return app.send_static_file("AccessVis.html")
 
+@app.route("/ChartVis", methods=['GET', 'POST'])
+def ChartVis():
+    return app.send_static_file("ChartVis.html")
+
 @app.route("/PathVis", methods=['GET', 'POST'])
 def PathVis():
     return app.send_static_file("PathVis.html")

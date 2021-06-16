@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>People on Subway</title>
+    <script src="./static/jquery-3.6.0.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
+
+    <!-- <script
+        src="https://webapi.amap.com/maps?v=1.4.15&key=a965d6338787750450f3bb358c3f5574&plugin=AMap.Scale,AMap.ToolBar"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script> -->
+
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
+    <script type="text/javascript" src="./static/bmap.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark" style="height: 8%; font-size: 20px; text-align:center">
+    <a class="navbar-brand mr-auto" href="/" style="font-size: 25px">TrainVis</a>
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/StationVis">StationVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/TrainVis">TrainVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/AccessVis">AccessVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/ChartVis">ChartVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/PathVis">PathVis</a>
+        </li>
+    </ul>
+</nav>
+
+<body style="height: 92%; margin: 0">
+
+    <div id="main" style="height: 100%; margin: 0"></div>
+    <!--统计图显示于此-->
+    <script type="text/javascript">
+
+        // var app = {};
+
+        // var chartDom = document.getElementById('main');
+        // var myChart = echarts.init(chartDom);
+        // var option;
+
+        // $.get('/static/TrainInfo.json', function (trainData) {
+        //     $.get('/static/StationGeo.json', function (stationGeo) {
+        //         var hStep = 300 / (trainData.length - 1);
+        //         var trainLines = [];
+        //         for (var idx = 0; idx < trainData.length; idx++) {
+        //             var trains = trainData[idx].key;
+        //             var points = [];
+        //             for (var i = 0; i < trains.length; i++) {
+        //                 if (trains[i] != "" && stationGeo[trains[i]] != undefined)
+        //                     points.push(stationGeo[trains[i]]);
+        //             }
+        //             //alert(points);
+        //             if (points.length == 0)
+        //                 continue;
+        //             trainLines.push({
+        //                 coords: points,
+        //                 lineStyle: {
+        //                     normal: {
+        //                         color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))
+        //                     }
+        //                 }
+        //             });
+        //         }
+
+        //         var map_style = [];
+        //         $.get('static/map_style_config.json', function (map_style_data) {
+        //             map_style = Object.values(map_style_data);
+        //             myChart.setOption(option = {
+        //                 bmap: {
+        //                     // center: [116.46, 39.92],
+        //                     // zoom: 10,
+        //                     center: [104.114129, 37.550339],
+        //                     zoom: 5,
+        //                     roam: true,
+        //                     mapStyle: {
+        //                         'styleJson': map_style
+        //                     }
+        //                 },
+        //                 series: [{
+        //                     type: 'lines',
+        //                     coordinateSystem: 'bmap',
+        //                     polyline: true,
+        //                     data: trainLines,
+        //                     silent: true,
+        //                     lineStyle: {
+        //                         // color: '#c23531',
+        //                         // color: 'rgb(200, 35, 45)',
+        //                         opacity: 0.2,
+        //                         width: 1
+        //                     },
+        //                     progressiveThreshold: 500,
+        //                     progressive: 200
+        //                 }, {
+        //                     type: 'lines',
+        //                     coordinateSystem: 'bmap',
+        //                     polyline: true,
+        //                     data: trainLines,
+        //                     lineStyle: {
+        //                         width: 0
+        //                     },
+        //                     effect: {
+        //                         constantSpeed: 20,
+        //                         show: true,
+        //                         trailLength: 0.1,
+        //                         symbolSize: 1.5
+        //                     },
+        //                     zlevel: 1
+        //                 }]
+        //             });
+        //         });
+        //     })
+        // });
+
+        // option && myChart.setOption(option);
+
+
+        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+        var app = {};
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        $.get(ROOT_PATH + '/data/asset/data/lines-bus.json', function (data) {
+            var hStep = 300 / (data.length - 1);
+            var busLines = [].concat.apply([], data.map(function (busLine, idx) {
+                var prevPt;
+                var points = [];
+                for (var i = 0; i < busLine.length; i += 2) {
+                    var pt = [busLine[i], busLine[i + 1]];
+                    if (i > 0) {
+                        pt = [
+                            prevPt[0] + pt[0],
+                            prevPt[1] + pt[1]
+                        ];
+                    }
+                    prevPt = pt;
+
+                    points.push([pt[0] / 1e4, pt[1] / 1e4]);
+                }
+                return {
+                    coords: points,
+                    lineStyle: {
+                        normal: {
+                            color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))
+                        }
+                    }
+                };
+            }));
+            myChart.setOption(option = {
+                bmap: {
+                    center: [116.46, 39.92],
+                    zoom: 10,
+                    roam: true,
+                    mapStyle: {
+                        'styleJson': [
+                            {
+                                'featureType': 'water',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#031628'
+                                }
+                            },
+                            {
+                                'featureType': 'land',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#000102'
+                                }
+                            },
+                            {
+                                'featureType': 'highway',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'visibility': 'off'
+                                }
+                            },
+                            {
+                                'featureType': 'arterial',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'arterial',
+                                'elementType': 'geometry.stroke',
+                                'stylers': {
+                                    'color': '#0b3d51'
+                                }
+                            },
+                            {
+                                'featureType': 'local',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'railway',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'railway',
+                                'elementType': 'geometry.stroke',
+                                'stylers': {
+                                    'color': '#08304b'
+                                }
+                            },
+                            {
+                                'featureType': 'subway',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'lightness': -70
+                                }
+                            },
+                            {
+                                'featureType': 'building',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'all',
+                                'elementType': 'labels.text.fill',
+                                'stylers': {
+                                    'color': '#857f7f'
+                                }
+                            },
+                            {
+                                'featureType': 'all',
+                                'elementType': 'labels.text.stroke',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'building',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#022338'
+                                }
+                            },
+                            {
+                                'featureType': 'green',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#062032'
+                                }
+                            },
+                            {
+                                'featureType': 'boundary',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#465b6c'
+                                }
+                            },
+                            {
+                                'featureType': 'manmade',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#022338'
+                                }
+                            },
+                            {
+                                'featureType': 'label',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'visibility': 'off'
+                                }
+                            }
+                        ]
+                    }
+                },
+                series: [{
+                    type: 'lines',
+                    coordinateSystem: 'bmap',
+                    polyline: true,
+                    data: busLines,
+                    silent: true,
+                    lineStyle: {
+                        // color: '#c23531',
+                        // color: 'rgb(200, 35, 45)',
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    progressiveThreshold: 500,
+                    progressive: 200
+                }, {
+                    type: 'lines',
+                    coordinateSystem: 'bmap',
+                    polyline: true,
+                    data: busLines,
+                    lineStyle: {
+                        width: 0
+                    },
+                    effect: {
+                        constantSpeed: 20,
+                        show: true,
+                        trailLength: 0.1,
+                        symbolSize: 1.5
+                    },
+                    zlevel: 1
+                }]
+            });
+        });
+
+        option && myChart.setOption(option);
+
+    </script>
+</body>
+
+</html>
