@@ -47,61 +47,59 @@
     <!--统计图显示于此-->
     <script type="text/javascript">
 
-        //var echarts = require('echarts');
-        var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
-        var app = {};
-
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom);
         var option;
 
-        $.get('static/StationInfo.json', function (data)
+        $.get('static/StationGeo.json', function(geoData)
         {
-
-            var points = [].concat(data.map(function (track)
+            $.get('static/AccessInfo.json', function (data)
             {
-                var ls = [];
-                ls.push(track.lon);
-                ls.push(track.lat);
-                if (track.trains == undefined)
-                    ls.push(0);
-                else
-                    ls.push(Object.values(track.trains).length);
-                return ls;
-            }));
-            //alert(points[1]);
-            myChart.setOption(option = {
-                animation: true,
-                bmap: {
-                    center: [104.114129, 37.550339],
-                    zoom: 5,
-                    roam: true
-                },
-                visualMap: {
-                    show: true,
-                    top: 'top',
-                    min: 0,
-                    //max: 700,
-                    seriesIndex: 0,
-                    calculable: true,
-                    inRange: {
-                        color: ['blue', 'green', 'yellow', 'red']
-                    }
-                },
-                series: [{
-                    type: 'heatmap',
-                    coordinateSystem: 'bmap',
-                    data: points,
-                    pointSize: 7,
-                    blurSize: 7
-                }]
+                var points = [];
+                for(var station in data)
+                {
+                    var ls = []
+                    if(geoData[station] != undefined)
+                        ls = geoData[station];
+                    else
+                        continue
+                    ls.push(data[station]);
+                    points.push(ls);
+                }
+
+                myChart.setOption(option = {
+                    animation: true,
+                    bmap: {
+                        center: [104.114129, 37.550339],
+                        zoom: 5,
+                        roam: true
+                    },
+                    visualMap: {
+                        show: true,
+                        top: 'top',
+                        min: 10,
+                        //max: 5000,
+                        seriesIndex: 0,
+                        calculable: true,
+                        inRange: {
+                            color: ['blue', 'green', 'yellow', 'red']
+                        }
+                    },
+                    series: [{
+                        type: 'heatmap',
+                        coordinateSystem: 'bmap',
+                        data: points,
+                        pointSize: 4,
+                        blurSize: 5
+                    }]
+                });
+                //  添加百度地图插件
+                var bmap = myChart.getModel().getComponent('bmap').getBMap();
+                bmap.setMapStyleV2({
+                    styleId: 'b0a8cb25619b8aec496dfadbcfb706c6'
+                });
             });
-            //  添加百度地图插件
-            var bmap = myChart.getModel().getComponent('bmap').getBMap();
-            bmap.setMapStyleV2({
-                styleId: 'b0a8cb25619b8aec496dfadbcfb706c6'
-            });
-        });
+        })
 
         if (option && typeof option === 'object')
         {
