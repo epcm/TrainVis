@@ -34,7 +34,8 @@
 
 ## 项目结构
 
-.
+```.
+./TrainVis/
 ├── README.md  
 ├── data_acquisition_and_processing  
 │   ├── DataProcessor.ipynb  
@@ -72,7 +73,10 @@
             ├── bmap.js.map  
             ├── echarts.js  
             ├── echarts.js.map  
-            └── jquery-3.6.0.js   
+            └── jquery-3.6.0.js   ```
+```
+
+
 
 ## 使用
 
