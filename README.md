@@ -16,6 +16,8 @@
 
 **AccessVis**: 区域可达性可视化，可达性取决于经停列车与直接相连城市
 
+站点可达性=Σ可直接到达站点*站点权重 
+
 ![image-20210630180222740](https://raw.githubusercontent.com/epcm/Pictures/master/Markdown/image-20210630180222740.png)
 
 **ChartVis**: 东部、中部、西北、东北地区大站间的连接关系
