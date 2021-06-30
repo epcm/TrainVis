@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>StationVis</title>
+    <script src="./static/js/jquery-3.6.0.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=5c3qkRhHUBf4eokNGVi13AACExyU0nhs"></script>
+    <script type="text/javascript" src="./static/js/bmap.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark" style="height: 8%; font-size: 20px; text-align:center">
+    <a class="navbar-brand mr-auto" href="/" style="font-size: 25px">TrainVis</a>
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/StationVis">StationVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/TrainVis">TrainVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/AccessVis">AccessVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/ChartVis">ChartVis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/PathVis">PathVis</a>
+        </li>
+    </ul>
+</nav>
+
+<body style="height: 92%; margin: 0">
+    <div id="main" style="height: 100%; margin: 0"></div>
+    <script type="text/javascript">
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        $.get('static/data/RelationChartInfo.json', function (data)
+        {
+            nodes = data.nodes.map(function (node)
+            {
+                return {
+                    name: node.name,
+                    value: node.value,
+                    category: node.category,
+                    symbolSize: node.value * 10//Math.log2(node.value)*10
+                };
+            });
+            nodes = nodes.sort(function (a, b)
+            {
+                return b.value - a.value;
+            });
+            edges = data.edges.map(function (edge)
+            {
+                return {
+                    source: edge.source,
+                    target: edge.target
+                };
+            });
+            myChart.setOption(option = {
+                legend: [
+                    { data: ["东部", "中部", "西部", "东北"] , selectedMode: false}
+                ],
+                tooltip: {},
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    force: {
+                        initLayout: "circular",
+                        repulsion: 28000,
+                        gravity: 0.2,
+                        layoutAnimation: false,
+                    },
+                    label: {
+                        position: 'right',
+                        formatter: '{b}'
+                    },
+                    // progressiveThreshold: 700,
+                    draggable: true,
+                    categories: data.categories,
+                    data: nodes,
+                    edges: edges,
+                    emphasis: {
+                        focus: 'adjacency',
+                        label: {
+                            position: 'right',
+                            show: true
+                        }
+                    },
+                    roam: true,
+                    lineStyle: {
+                        width: 0.5,
+                        //curveness: 0.3,
+                        opacity: 0.7
+                    }
+                }]
+            }, true);
+        });
+
+        if (option && typeof option === 'object')
+        {
+            myChart.setOption(option);
+        }
+
+    </script>
+</body>
+
+</html>
