@@ -2,6 +2,8 @@
 
 本项目从不同网站爬取了全国3.3k车站和8.3k列车的信息，并使用echarts进行可视化，利用Flask+html将结果呈现在网页中
 
+注：图片使用github图床存储，若不能正常显示请尝试使用vpn越过Great Wall
+
 ## 效果展示
 
 **StationVis**: 站点可视化，突出区域铁路交通中心
@@ -26,17 +28,61 @@
 
 注：为了展示效果，图中仅截取了地图的一部分，南海、黑龙江省的可在网页中拖动查看
 
+## 项目结构
+
+.
+├── README.md
+├── data_acquisition_and_processing
+│   ├── DataProcessor.ipynb
+│   ├── data
+│   │   ├── station_base.csv
+│   │   ├── station_geo.json
+│   │   ├── trains.json
+│   │   └── trains_base.json
+│   ├── json_station_geo.py
+│   ├── json_train.py
+│   ├── main.ipynb
+│   ├── spider_station_geo.py
+│   ├── spider_telecode.py
+│   └── spider_traininfo.py
+└── web_visualization
+    ├── main.py
+    └── static
+        ├── AccessVis.html
+        ├── ChartVis.html
+        ├── PathVis.html
+        ├── StationVis.html
+        ├── TrainVis.html
+        ├── data
+        │   ├── AccessInfo.json
+        │   ├── MapStyleConfig.json
+        │   ├── MergedTrainInfo.json
+        │   ├── RelationChartInfo.json
+        │   ├── StationGeo.json
+        │   ├── StationInfo.json
+        │   ├── TrainInfo.json
+        │   └── min_adjacency_table.json
+        ├── index.html
+        └── js
+            ├── bmap.js
+            ├── bmap.js.map
+            ├── echarts.js
+            ├── echarts.js.map
+            └── jquery-3.6.0.js
+
 ## 使用
 
 1. 安装python依赖
 
    `pip install flask pandas numpy`
 
-2. 运行`main.py`
+2. 切换到`./web_visualization`
 
-3. 使用上方导航栏切换不同视图
+3. 运行`main.py`
 
-4. 注意PathVis仅支持部分站点间的路径规划，支持的站点已在网页中使用黄色图标标记
+4. 使用上方导航栏切换不同视图
+
+5. 注意PathVis仅支持部分站点间的路径规划，支持的站点已在网页中使用黄色图标标记
 
    例如：起始站：`北京南`     终点站： `乌鲁木齐`    时间优先
 
@@ -50,10 +96,12 @@
 
 ### 数据构建步骤
 
-1. 依次执行`main.ipynb`中各个模块
-2. 将数据库中`train.StationGeo`复制为`train.Station`
-3. 依次执行`DataProcessor.ipynb`中各个模块
-4. 导出`train.Train`为`TrainInfo.json`，导出`train.Station`为`StationInfo.json`
+1. 切换到`./data_acquisition_and_processing`
+2. 依次执行`main.ipynb`中各个模块
+3. 将数据库中`train.StationGeo`复制为`train.Station`
+4. 依次执行`DataProcessor.ipynb`中各个模块
+5. 导出`train.Train`为`TrainInfo.json`，导出`train.Station`为`StationInfo.json`
+6. 将生成的json文件放入`./web_visualization/static/data`
 
 ### 基础数据:
 
