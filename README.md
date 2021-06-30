@@ -31,44 +31,44 @@
 ## 项目结构
 
 .
-├── README.md
-├── data_acquisition_and_processing
-│   ├── DataProcessor.ipynb
-│   ├── data
-│   │   ├── station_base.csv
-│   │   ├── station_geo.json
-│   │   ├── trains.json
-│   │   └── trains_base.json
-│   ├── json_station_geo.py
-│   ├── json_train.py
-│   ├── main.ipynb
-│   ├── spider_station_geo.py
-│   ├── spider_telecode.py
-│   └── spider_traininfo.py
-└── web_visualization
-    ├── main.py
-    └── static
-        ├── AccessVis.html
-        ├── ChartVis.html
-        ├── PathVis.html
-        ├── StationVis.html
-        ├── TrainVis.html
-        ├── data
-        │   ├── AccessInfo.json
-        │   ├── MapStyleConfig.json
-        │   ├── MergedTrainInfo.json
-        │   ├── RelationChartInfo.json
-        │   ├── StationGeo.json
-        │   ├── StationInfo.json
-        │   ├── TrainInfo.json
-        │   └── min_adjacency_table.json
-        ├── index.html
-        └── js
-            ├── bmap.js
-            ├── bmap.js.map
-            ├── echarts.js
-            ├── echarts.js.map
-            └── jquery-3.6.0.js
+├── README.md  
+├── data_acquisition_and_processing  
+│   ├── DataProcessor.ipynb  
+│   ├── data  
+│   │   ├── station_base.csv  
+│   │   ├── station_geo.json  
+│   │   ├── trains.json  
+│   │   └── trains_base.json  
+│   ├── json_station_geo.py  
+│   ├── json_train.py  
+│   ├── main.ipynb  
+│   ├── spider_station_geo.py  
+│   ├── spider_telecode.py  
+│   └── spider_traininfo.py  
+└── web_visualization  
+    ├── main.py  
+    └── static  
+        ├── AccessVis.html  
+        ├── ChartVis.html  
+        ├── PathVis.html  
+        ├── StationVis.html  
+        ├── TrainVis.html  
+        ├── data  
+        │   ├── AccessInfo.json  
+        │   ├── MapStyleConfig.json  
+        │   ├── MergedTrainInfo.json  
+        │   ├── RelationChartInfo.json  
+        │   ├── StationGeo.json  
+        │   ├── StationInfo.json  
+        │   ├── TrainInfo.json  
+        │   └── min_adjacency_table.json  
+        ├── index.html  
+        └── js  
+            ├── bmap.js  
+            ├── bmap.js.map  
+            ├── echarts.js  
+            ├── echarts.js.map  
+            └── jquery-3.6.0.js   
 
 ## 使用
 
