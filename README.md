@@ -2,8 +2,6 @@
 
 本项目从不同网站爬取了全国3.3k车站和8.3k列车的信息，并使用echarts进行可视化，利用Flask+html将结果呈现在网页中
 
-项目地址：https://github.com/epcm/TrainVis
-
 注：图片使用github图床存储，若不能正常显示请尝试使用vpn越过Great Wall
 
 ## 效果展示
